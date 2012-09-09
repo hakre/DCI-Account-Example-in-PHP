@@ -1,3 +1,4 @@
-At 9.3.3:
+At 9.4.3:
 
  * Currency was missing, added some hobby class representing a string.
+ * Methodless Role Types created as PHP Interfaces.
