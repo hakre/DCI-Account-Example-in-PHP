@@ -17,38 +17,64 @@ class Currency
     /**
      * @var string
      */
-    private $amount;
+    protected $sign, $integer, $decimal;
 
     public function __construct($amount) {
-        $this->setAmountFromString($amount);
+        $this->setFromString($amount);
     }
 
-    private function setAmountFromString($amount) {
-        $r = preg_match('~^((?:\d+ )*\d+)(?:\.(\d*))?$~', $amount, $matches);
+    public function isNegative() {
+        return $this->sign === '-';
+    }
+
+    public function add(Currency $amount) {
+        $this->operate('add', $amount);
+    }
+
+    public function sub(Currency $amount) {
+        $this->operate('sub', $amount);
+    }
+
+    private function operate($operation, Currency $operand) {
+        $result = (new CurrencyOperation)->{$operation}($this, $operand);
+        $this->setFromString($result);
+    }
+
+    protected function setFromString($string) {
+        $r = preg_match('~^(?:([+-])(?: *))?((?:\d+ )*\d+)?(?:\.(\d*))?$~', $string, $matches);
         if (!$r) {
-            throw new \InvalidArgumentException(sprintf('Amount invalid format: "%s"', $amount));
+            throw new \InvalidArgumentException(sprintf('Amount invalid format: "%s"', $string));
         }
-        list(, $before, $after) = $matches + [null, 0, 0];
+        list(, $sign, $before, $after) = $matches + [null, '', 0, 0];
 
-        // format amount 1 234.678
-        $buffer = strrev((str_replace(' ', '', $before)));
-        $buffer = implode(' ', str_split($buffer, 3));
-        $before = strrev($buffer);
-        if (!strlen($before)) {
-            $before = '0';
-        }
+        $sign === '' && $sign = '+';
 
-        if (strlen($after) < 2) {
-            $after .= '0';
-        }
+        $before = strtr($before, [' ' => '']);
+        $before = ltrim($before, '0');
+        $before || $before = '0';
 
+        $after = rtrim($after, '0');
+        $after || $after = '0';
+
+        assert('strpos(" +-", $sign)');
         assert('strlen($before) > 0');
-        assert('strlen($after ) > 1');
+        assert('strlen($after ) > 0');
 
-        $this->amount = $before . '.' . $after;
+        $this->sign    = $sign;
+        $this->integer = $before;
+        $this->decimal = $after;
     }
 
     public function __toString() {
-        return $this->amount;
+
+        // format amount +/- 1 234.678
+        $buffer = strrev($this->integer);
+        $buffer = implode(' ', str_split($buffer, 3));
+        $before = strrev($buffer);
+
+        $after = $this->decimal;
+        strlen($after) < 2 && $after .= '0';
+
+        return $this->sign . ' ' . $before . '.' . $after;
     }
 }

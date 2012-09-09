@@ -3,3 +3,8 @@ At 9.4.3:
  * Currency was missing, added some hobby class representing a string.
  * Methodless Role Types created as PHP Interfaces.
  * Used Fully-Qualified Namespaces for method parameters.
+
+At 9.4.4:
+
+ * Currency grows with operations and abstract Account base class was
+   added for the examples different account types.
