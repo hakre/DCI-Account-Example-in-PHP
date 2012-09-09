@@ -1,0 +1,40 @@
+DCI Account Example in PHP
+==========================
+
+  After reading the book [1] and because PHP since version 5.4 supports
+Traits,  this  example has been written to practice with DCI in PHP and
+to look if a compile time trait  based  implementation is  possible and
+useful in PHP as it is a dynamic language.
+
+  The usecases this example is based on are in the book, see  chapter 7
+for the scenario and section 9.4.1 Figures 9-7 and 9-8 for details.
+
+  Expectations and considerations before writing the code:
+
+   * Traits might lead to much boilerplate as they are static.
+   * For PHP as a dynamic language,  some dynamic extension  of classes
+     seem more fitting than compile time traits [2].
+   * No preference for one of the different ways of passing the Context
+     Object has been made upfront.
+   * The final example should cover fetching from the "database".
+   * The final example should cover nested Contexts (habits).
+   * I tend to  prefer going  along with chapter 9 instead of using the
+     language examples.
+
+  Further Questions:
+
+   ? Is it possible to have DCI on  the server-side and keep MVC inside
+     the browser?
+
+
+hakre, Lago Como, September 2012
+
+--
+
+[1] Lean Architecture for Agile Software Development
+      By James O. Coplien and Gertrud Bjørnvig (2010)
+      Published by Wiley
+      ISBN 978-0-470-68420-7
+      (based on the September 2011 release)
+
+[2] Hopefully this example will help to clarify this.
