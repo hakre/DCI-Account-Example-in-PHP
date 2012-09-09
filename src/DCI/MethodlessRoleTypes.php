@@ -7,21 +7,18 @@
  * @author hakre
  */
 
-use \DateTime;
-use \App\Currency;
-
 interface MoneySource
 {
-    function decreaseBalance(Currency $amount);
+    function decreaseBalance(\App\Currency $amount);
 
-    function transferTo(Currency $amount, MoneySink $recipient);
+    function transferTo(\App\Currency $amount, MoneySink $recipient);
 }
 
 interface MoneySink
 {
-    function increaseBalance(Currency $amount);
+    function increaseBalance(\App\Currency $amount);
 
-    function updateLog($string, DateTime $time, Currency $currency);
+    function updateLog($string, \DateTime $time, \App\Currency $currency);
 
-    function transferFrom(Currency $amount, MoneySource $source);
+    function transferFrom(\App\Currency $amount, MoneySource $source);
 }
