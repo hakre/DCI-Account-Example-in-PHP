@@ -7,7 +7,7 @@
  * @author hakre
  */
 
-require __DIR__ . '/src/autoloader.php';
+require_once __DIR__ . '/src/autoloader.php';
 
 /// Methodful Roles as Traits ///
 
