@@ -8,3 +8,7 @@ At 9.4.4:
 
  * Currency grows with operations and abstract Account base class was
    added for the examples different account types.
+ * Methodful Object Roles (classes) created as PHP Traits.
+    >>> Traits can not be defined against the Methodless Role Type
+    Interfaces. Mock as class, implement interface, stub methods and
+    change class to trait, remove extends. <<<

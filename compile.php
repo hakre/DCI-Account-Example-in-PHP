@@ -9,6 +9,13 @@
 
 require __DIR__ . '/src/autoloader.php';
 
+/// Methodful Roles as Traits ///
+
+class CMoneySourceActor extends \App\Account implements MoneySource
+{
+    use TransferMoneySource;
+}
+
 /// Methodless Role Types ///
 
 abstract class CMoneySource implements MoneySource

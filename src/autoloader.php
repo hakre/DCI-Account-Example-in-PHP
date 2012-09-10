@@ -12,6 +12,7 @@
  */
 foreach ([
              'DCI/MethodlessRoleTypes',
+             'DCI/MethodfulRoles',
          ] as $file) {
     require __DIR__ . '/' . $file . '.php';
 }
