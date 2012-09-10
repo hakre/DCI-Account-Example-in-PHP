@@ -15,6 +15,7 @@ class CurrencyOperation extends Currency
     }
 
     public function add(Currency $a, Currency $b) {
+
         list($orig, $sa, $sb) = $this->cloneAndPadDecimalAndString($a, $b);
 
         $sc = $sa + $sb;
@@ -23,11 +24,19 @@ class CurrencyOperation extends Currency
     }
 
     public function sub(Currency $a, Currency $b) {
+
         list($orig, $sa, $sb) = $this->cloneAndPadDecimalAndString($a, $b);
 
         $sc = $sa - $sb;
 
         return new Currency(substr_replace($sc, '.', -$orig, 0));
+    }
+
+    public function compare(Currency $a, Currency $b) {
+
+        list(, $sa, $sb) = $this->cloneAndPadDecimalAndString($a, $b);
+
+        return $sa - $sb;
     }
 
     private function cloneAndPadDecimalAndString(Currency $a, Currency $b) {

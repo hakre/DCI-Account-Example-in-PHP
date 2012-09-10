@@ -23,6 +23,10 @@ class Currency
         $this->setFromString($amount);
     }
 
+    public function isLowerThan(Currency $amount) {
+        return 0 < $this->operation('compare', $amount);
+    }
+
     public function isNegative() {
         return $this->sign === '-';
     }
@@ -36,8 +40,17 @@ class Currency
     }
 
     private function operate($operation, Currency $operand) {
-        $result = (new CurrencyOperation)->{$operation}($this, $operand);
+        $result = $this->operate($operation, $operand);
         $this->setFromString($result);
+    }
+
+    /**
+     * @param string $operation
+     * @param Currency $operand
+     * @return Currency
+     */
+    private function operation($operation, Currency $operand) {
+        return (new CurrencyOperation)->{$operation}($this, $operand);
     }
 
     protected function setFromString($string) {
