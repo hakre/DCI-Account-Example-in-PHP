@@ -2,7 +2,7 @@
 /**
  * DCI Account Example in PHP
  *
- * Currency Type Addition Operation
+ * Currency Type Operation
  *
  * @author hakre
  */
