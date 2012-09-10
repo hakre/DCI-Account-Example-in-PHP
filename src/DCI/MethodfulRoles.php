@@ -7,29 +7,34 @@
  * @author hakre
  */
 
-trait TransferMoneySource
+trait TransferMoneySink # extends \App\Account implements MoneySink
 {
-    function decreaseBalance(\App\Currency $amount) {
-        // TODO: Implement decreaseBalance() method.
-    }
-
-    function transferTo(\App\Currency $amount, MoneySink $recipient) {
-        // TODO: Implement transferTo() method.
+    function transferFrom(\App\Currency $amount, MoneySource $source) {
+        $this->increaseBalance($amount);
+        $this->updateLog('Transfer in', new DateTime, $amount);
     }
 }
 
-trait TransferMoneySink
+trait TransferMoneySource # extends App\Account implements MoneySource
 {
+    use Transaction;
+    use Gui;
 
-    function increaseBalance(\App\Currency $amount) {
-        // TODO: Implement increaseBalance() method.
-    }
+    function transferTo(\App\Currency $amount, MoneySink $recipient) {
 
-    function updateLog($string, \DateTime $time, \App\Currency $currency) {
-        // TODO: Implement updateLog() method.
-    }
+        $this->beginTransaction();
 
-    function transferFrom(\App\Currency $amount, MoneySource $source) {
-        // TODO: Implement transferFrom() method.
+        if ($this->balance->isLowerThan($amount)) {
+            $this->endTransaction();
+            throw new InvalidArgumentException(sprintf('Insufficient Funds (%s) to transfer %s.', $this->balance, $amount));
+        }
+
+        $this->decreaseBalance($amount);
+
+        $recipient->increaseBalance($amount);
+        $this->updateLog('Transfer Out', new DateTime, $amount);
+        $recipient->updateLog('Transfer In', new DateTime, $amount);
+        $this->guiDisplayScreen("SUCCESS_DEPOSIT_SCREEN");
+        $this->endTransaction();
     }
 }
