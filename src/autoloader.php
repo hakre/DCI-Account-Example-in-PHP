@@ -12,8 +12,9 @@
  * SPL autoloader
  */
 spl_autoload_register(function($class) {
-    is_file($file = __DIR__ . '/' . remove_dot_segments($class) . '.php')
-        && (require $file);
+
+    $file = __DIR__ . '/' . remove_dot_segments($class) . '.php';
+    is_file($file) && (require $file);
 });
 
 /**
@@ -25,8 +26,9 @@ foreach ([
 
              'DCI/MethodlessRoleTypes',
              'DCI/MethodfulRoles',
-         ] as $file) {
-    require __DIR__ . '/' . $file . '.php';
+         ] as $part) {
+    $file = __DIR__ . '/' . $part . '.php';
+    require $file;
 }
 
 /**
@@ -36,6 +38,7 @@ foreach ([
  * @return string
  */
 function remove_dot_segments($path) {
+
     $parts = explode('/', strtr($path, ['\\' => '/']));
     $stack = [];
     foreach ($parts as $part) {
