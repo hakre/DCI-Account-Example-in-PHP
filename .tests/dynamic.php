@@ -9,8 +9,9 @@
 
 require __DIR__ . '/../src/autoloader.php';
 
-use  DCI\Casting\PhpClassname;
-use  DCI\Casting\PhpCast;
+use DCI\Casting\PhpClassname;
+use DCI\Casting\PhpCast;
+use DCI\Casting;
 
 class InvalidTypeException extends RuntimeException
 {
@@ -59,7 +60,7 @@ trait ActorDecorator
 
 }
 
-class Actor
+class Actor extends Casting
 {
     /**
      * @var PhpClassname
@@ -69,17 +70,6 @@ class Actor
     public function __construct($class) {
 
         $this->class = new PhpClassname($class);
-    }
-
-    /**
-     * @param object $citizen
-     * @param string $script trait
-     * @param string $role interface
-     */
-    function cast($citizen, $script, $role) {
-
-        $class = get_class($citizen);
-
     }
 
     public function castRole($trait, $interface) {
@@ -102,31 +92,6 @@ class Actor
 
         return $actorClassname;
     }
-
-    private function generateActorClass($actorClassname, $classFQCN, $traitFQCN, $interfaceFQCN) {
-
-        $newActorClass      = new PhpClassname($actorClassname);
-        $actorNamespace     = $newActorClass->getNamespace();
-        $actorBaseClassname = $newActorClass->getBasename();
-
-        $definition = "
-            namespace $actorNamespace;
-
-            class $actorBaseClassname extends $classFQCN implements $interfaceFQCN {
-                use $traitFQCN;
-            }
-        ";
-
-        return $definition;
-    }
-
-    private function generateActorClassname($classFQCN, $traitFQCN, $interfaceFQCN) {
-
-        $traitHash     = PhpClassname::hash($traitFQCN);
-        $interfaceHash = PhpClassname::hash($interfaceFQCN);
-
-        return sprintf("%s᚜%sᚖ%s᚛", $classFQCN, $traitHash, $interfaceHash);
-    }
 }
 
 function make_actor_class($class, $trait, $interface) {
@@ -146,12 +111,10 @@ function make_actor($citizen, $script, $role) {
 
 $source = new \App\CheckingAccount();
 $source->increaseBalance(new \App\Currency(1000));
-$sourceActorClass = make_actor_class('App\CheckingAccount', 'TransferMoneySource', 'MoneySource');
-$sourceActor      = PhpCast::cast($source, $sourceActorClass);
+$sourceActor = make_actor($source, 'TransferMoneySource', 'MoneySource');
 
-$sink           = new \App\SavingsAccount();
-$sinkActorClass = make_actor_class('App\SavingsAccount', 'TransferMoneySink', 'MoneySink');
-$sinkActor      = PhpCast::cast($sink, $sinkActorClass);
+$sink      = new \App\SavingsAccount();
+$sinkActor = make_actor($sink, 'TransferMoneySink', 'MoneySink');
 
 /**
  * @var $sourceActor TransferMoneySource
@@ -163,8 +126,11 @@ $sourceActor2->transferTo(new \App\Currency(10), $sinkActor);
 
 echo "After: ", $sourceActor2->getAvailableBalance(), "\n";
 
-$casting = new DCI\Casting();
+$casting = new Casting();
 $casting->setRoleAndScript('MoneySource', 'TransferMoneySource')->castOf($sourceActor2);
+
+$casting2 = new Casting('MoneySink', 'TransferMoneySink');
+$casting2->castOf($sinkActor);
 
 $sourceActor2->transferTo(new \App\Currency(980), $sinkActor);
 echo "After: ", $sourceActor2->getAvailableBalance(), "\n";
