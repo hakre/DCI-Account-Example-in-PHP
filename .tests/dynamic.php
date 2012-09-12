@@ -68,16 +68,7 @@ class Actor
 
     public function __construct($class) {
 
-        $this->setClass($class);
-    }
-
-    public function setClass($class) {
-
-        if ($class instanceof PhpClassname) {
-            $this->class = $class;
-        } else {
-            $this->class = new PhpClassname($class);
-        }
+        $this->class = new PhpClassname($class);
     }
 
     public function castRole($trait, $interface) {
