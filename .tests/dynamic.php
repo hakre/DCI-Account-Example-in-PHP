@@ -71,11 +71,24 @@ class Actor
         $this->class = new PhpClassname($class);
     }
 
+    /**
+     * @param object $citizen
+     * @param string $script trait
+     * @param string $role interface
+     */
+    function cast($citizen, $script, $role) {
+
+        $class = get_class($citizen);
+
+    }
+
     public function castRole($trait, $interface) {
 
-        $traitFQCN     = (new PhpClassname($trait))->getFullyQualifiedClassName();
-        $interfaceFQCN = (new PhpClassname($interface))->getFullyQualifiedClassName();
-        $classFQCN     = $this->class->getFullyQualifiedClassName();
+        $class = $this->class;
+
+        $traitFQCN     = PhpClassname::FQCN($trait);
+        $interfaceFQCN = PhpClassname::FQCN($interface);
+        $classFQCN     = PhpClassname::FQCN($class);
 
         $actorClassname = $this->generateActorClassname($classFQCN, $traitFQCN, $interfaceFQCN);
 
@@ -94,16 +107,14 @@ class Actor
 
     private function generateActorClass($actorClassname, $classFQCN, $traitFQCN, $interfaceFQCN) {
 
-        $newClass = new PhpClassname($actorClassname);
-
-        $namespace     = $newClass->getNamespace();
-        $classBasename = $newClass->getBasename();
-
+        $newActorClass      = new PhpClassname($actorClassname);
+        $actorNamespace     = $newActorClass->getNamespace();
+        $actorBaseClassname = $newActorClass->getBasename();
 
         $definition = "
-            namespace $namespace;
+            namespace $actorNamespace;
 
-            class $classBasename extends $classFQCN implements $interfaceFQCN {
+            class $actorBaseClassname extends $classFQCN implements $interfaceFQCN {
                 use $traitFQCN;
             }
         ";
@@ -113,35 +124,43 @@ class Actor
 
     private function generateActorClassname($classFQCN, $traitFQCN, $interfaceFQCN) {
 
-        $traitHash     = (new PhpClassname($traitFQCN))->getHash();
-        $interfaceHash = (new PhpClassname($interfaceFQCN))->getHash();
+        $traitHash     = PhpClassname::hash($traitFQCN);
+        $interfaceHash = PhpClassname::hash($interfaceFQCN);
 
         return sprintf("%s_ACT_%s_ROLE_%s", $classFQCN, $traitHash, $interfaceHash);
     }
 }
 
-function make_actor($class, $trait, $interface) {
+function make_actor_class($class, $trait, $interface) {
 
     $actor = new Actor($class);
     return $actor->castRole($trait, $interface);
 }
 
+function make_actor($citizen, $script, $role) {
 
-$source           = new \App\CheckingAccount();
-$sourceActorClass = make_actor('App\CheckingAccount', 'TransferMoneySource', 'MoneySource');
-$sourceActor      = PhpCast::castAs($source, $sourceActorClass);
-$sourceActor->increaseBalance(new \App\Currency(1000));
+    $class      = get_class($citizen);
+    $driver     = new Actor($class);
+    $actorClass = $driver->castRole($script, $role);
+    $actor      = PhpCast::cast($citizen, $actorClass);
+    return $actor;
+}
 
+$source = new \App\CheckingAccount();
+$source->increaseBalance(new \App\Currency(1000));
+$sourceActorClass = make_actor_class('App\CheckingAccount', 'TransferMoneySource', 'MoneySource');
+$sourceActor      = PhpCast::cast($source, $sourceActorClass);
 
 $sink           = new \App\SavingsAccount();
-$sinkActorClass = make_actor('App\SavingsAccount', 'TransferMoneySink', 'MoneySink');
-$sinkActor      = PhpCast::castAs($sink, $sinkActorClass);
-
-// echo 'Class: ', $sourceActorClass, "\n";
-// echo 'Actor: ', var_dump($sourceActor);
-
+$sinkActorClass = make_actor_class('App\SavingsAccount', 'TransferMoneySink', 'MoneySink');
+$sinkActor      = PhpCast::cast($sink, $sinkActorClass);
 
 /**
  * @var $sourceActor TransferMoneySource
  */
 $sourceActor->transferTo(new \App\Currency(10), $sinkActor);
+
+$sourceActor2 = make_actor($sourceActor, 'TransferMoneySource', 'MoneySource');
+$sourceActor2->transferTo(new \App\Currency(10), $sinkActor);
+
+echo "After: ", $sourceActor2->getAvailableBalance(), "\n";
