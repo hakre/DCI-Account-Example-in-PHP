@@ -11,77 +11,65 @@ namespace DCI\Casting;
 
 class PhpClassname
 {
+    const SEPARATOR = '\\';
 
     static function FQCN($classname) {
 
-        return (new self($classname))->getFullyQualifiedClassName();
+        return self::SEPARATOR . ltrim($classname, self::SEPARATOR);
     }
 
     static function hash($classname) {
 
-        return (new self($classname))->getHash();
+        $string = ltrim($classname, self::SEPARATOR);
+        return strtr($string, [self::SEPARATOR => "__"]);
     }
 
-    protected $string;
-    private $namespaceSeparator = '\\';
+    protected $name;
 
     function __construct($string) {
 
-        $this->string = (string)$string;
+        $this->name = (string)$string;
     }
 
     function __toString() {
 
-        return $this->string;
+        return $this->name;
     }
 
     function getNamespace() {
 
-        $className          = $this->string;
-        $namespaceSeparator = $this->namespaceSeparator;
-
-        return ltrim($this->extractNamespace($className), $namespaceSeparator);
+        return ltrim($this->extractNamespace($this->name), self::SEPARATOR);
     }
 
     function getBasename() {
 
-        $className          = $this->string;
-        $namespaceSeparator = $this->namespaceSeparator;
+        $classname = $this->name;
 
-        $pos = strlen($this->extractNamespace($className));
+        $pos = strlen($this->extractNamespace($classname));
 
-        return ltrim(substr($className, $pos), $namespaceSeparator);
+        return ltrim(substr($classname, $pos), self::SEPARATOR);
     }
 
     function getFullyQualifiedClassName() {
 
-        $className          = $this->string;
-        $namespaceSeparator = $this->namespaceSeparator;
-
-        return $namespaceSeparator . ltrim($className, $namespaceSeparator);
+        return self::FQCN($this->name);
     }
 
     function getHash() {
 
-        $className          = $this->string;
-        $namespaceSeparator = $this->namespaceSeparator;
-
-        $string = ltrim($className, $namespaceSeparator);
-        return strtr($string, [$namespaceSeparator => "__"]);
+        return self::hash($this->name);
     }
 
-    private function extractNamespace($className) {
-
-        $namespaceSeparator = $this->namespaceSeparator;
+    private function extractNamespace($classname) {
 
         // TODO: Check for PHP string function: locate last occurrence of a char and return everything before it
-        $pos = strrpos($className, $namespaceSeparator);
+        $pos = strrpos($classname, self::SEPARATOR);
 
         if ($pos === false) {
-            return $className;
+            return $classname;
         }
 
-        return rtrim(substr($className, 0, $pos), $namespaceSeparator);
+        return rtrim(substr($classname, 0, $pos), self::SEPARATOR);
     }
 
 }
