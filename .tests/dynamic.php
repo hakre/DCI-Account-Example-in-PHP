@@ -86,13 +86,24 @@ class Actor
         $interfaceFQCN = (new PhpClassname($interface))->getFullyQualifiedClassName();
         $classFQCN     = $this->class->getFullyQualifiedClassName();
 
-        $newClassName = $this->generateActorClassname($classFQCN, $traitFQCN, $interfaceFQCN);
+        $actorClassname = $this->generateActorClassname($classFQCN, $traitFQCN, $interfaceFQCN);
 
-        if (class_exists($newClassName)) {
-            return $newClassName;
+        if (class_exists($actorClassname)) {
+            return $actorClassname;
         }
 
-        $newClass = new PhpClassname($newClassName);
+        $definition = $this->generateActorClass($actorClassname, $classFQCN, $traitFQCN, $interfaceFQCN);
+
+        echo $definition, "\n";
+
+        eval($definition);
+
+        return $actorClassname;
+    }
+
+    private function generateActorClass($actorClassname, $classFQCN, $traitFQCN, $interfaceFQCN) {
+
+        $newClass = new PhpClassname($actorClassname);
 
         $namespace     = $newClass->getNamespace();
         $classBasename = $newClass->getBasename();
@@ -106,14 +117,7 @@ class Actor
             }
         ";
 
-        echo $definition, "\n";
-
-        eval($definition);
-        return $newClass;
-    }
-
-    private function generateActorClass($classFQCN, $traitFQCN, $interfaceFQCN) {
-
+        return $definition;
     }
 
     private function generateActorClassname($classFQCN, $traitFQCN, $interfaceFQCN) {
@@ -140,7 +144,7 @@ function make_actor($class, $trait, $interface) {
 
 
 $source           = new \App\CheckingAccount();
-$sourceActorClass = make_actor('App\SavingsAccount', 'TransferMoneySource', 'MoneySource');
+$sourceActorClass = make_actor('App\CheckingAccount', 'TransferMoneySource', 'MoneySource');
 $sourceActor      = PhpCast::castAs($source, $sourceActorClass);
 $sourceActor->increaseBalance(new \App\Currency(1000));
 
