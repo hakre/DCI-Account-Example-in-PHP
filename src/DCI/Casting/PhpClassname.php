@@ -21,7 +21,7 @@ class PhpClassname
     static function hash($classname) {
 
         $string = ltrim($classname, self::SEPARATOR);
-        return strtr($string, [self::SEPARATOR => "__"]);
+        return strtr($string, [self::SEPARATOR => "╲"]);
     }
 
     protected $name;

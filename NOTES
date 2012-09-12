@@ -12,3 +12,24 @@ At 9.4.4:
     >>> Traits can not be defined against the Methodless Role Type
     Interfaces. Mock as class, implement interface, stub methods and
     change class to trait, remove extends. <<<
+
+
+Scala Copy:
+
+ * Traits in PHP are compile time copy and paste only. So this is actual
+   a pretty limited language feature and not a first class citizen.
+
+    - It does not support extending classes.
+    - It does not support implementing interfaces.
+    - It is just members only: Constants, Property and Function definition.
+
+ * For dynamic extension at runtime, the following two have been considered:
+
+   1. Decorator
+      (-) Can not access private members/functions
+
+   2. Serializer
+      (-) Does not work with models that do not serialize.
+
+ * Casting via eval() for the class creation and serialize() for casting
+   has been implemented.
