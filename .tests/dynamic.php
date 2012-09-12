@@ -10,55 +10,7 @@
 require __DIR__ . '/../src/autoloader.php';
 
 use DCI\Casting\PhpClassname;
-use DCI\Casting\PhpCast;
 use DCI\Casting;
-
-class InvalidTypeException extends RuntimeException
-{
-}
-
-trait ActorDecorator
-{
-    private $subject;
-
-    public function __construct($subject) {
-
-        $this->subject = $subject;
-    }
-
-    function __call($name, $arguments) {
-
-        $callable = array($this->subject, $name);
-        call_user_func_array($callable, $arguments);
-    }
-
-    function __clone() {
-
-        $this->subject = clone $this->subject;
-    }
-
-    function __destruct() {
-
-        $callable = array($this->subject, '__destruct');
-        if (is_callable($callable)) {
-            call_user_func($callable);
-        }
-    }
-
-    function __get($name) {
-
-        return $this->subject->{$name};
-    }
-
-    function __invoke() {
-
-        $callable = array($this->subject, '__invoke');
-        if (is_callable($callable)) {
-            call_user_func($callable);
-        }
-    }
-
-}
 
 class Actor extends Casting
 {
@@ -92,6 +44,11 @@ class Actor extends Casting
 
         return $actorClassname;
     }
+
+    public function cast($object, $as) {
+
+        return $this->castViaSerialize($object, $as);
+    }
 }
 
 function make_actor_class($class, $trait, $interface) {
@@ -105,7 +62,7 @@ function make_actor($citizen, $script, $role) {
     $class      = get_class($citizen);
     $driver     = new Actor($class);
     $actorClass = $driver->castRole($script, $role);
-    $actor      = PhpCast::cast($citizen, $actorClass);
+    $actor      = $driver->cast($citizen, $actorClass);
     return $actor;
 }
 
