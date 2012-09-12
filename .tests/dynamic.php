@@ -113,17 +113,10 @@ class Actor
 
     private function generateActorClassname($classFQCN, $traitFQCN, $interfaceFQCN) {
 
-        $traitFQCN     = $this->removeNamespaceChars($traitFQCN);
-        $interfaceFQCN = $this->removeNamespaceChars($interfaceFQCN);
+        $traitHash     = (new PhpClassname($traitFQCN))->getHash();
+        $interfaceHash = (new PhpClassname($interfaceFQCN))->getHash();
 
-        return sprintf("%s_ACT_%s_ROLE_%s", $classFQCN, $traitFQCN, $interfaceFQCN);
-    }
-
-    private function removeNamespaceChars($string) {
-
-        $namespaceSeparator = '\\';
-        $string             = ltrim($string, $namespaceSeparator);
-        return strtr($string, [$namespaceSeparator => "__"]);
+        return sprintf("%s_ACT_%s_ROLE_%s", $classFQCN, $traitHash, $interfaceHash);
     }
 }
 
