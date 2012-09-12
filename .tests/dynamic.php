@@ -59,133 +59,10 @@ trait ActorDecorator
 
 }
 
-
-class TLanguage extends PhpClassname
-{
-    private $autoload = true;
-
-    const TYPE_UNDEFINED = 0; # always equals 0 / false / null
-    const TYPE_CLASS     = 1;
-    const TYPE_INTERFACE = 2;
-    const TYPE_TRAIT     = 4;
-
-    private $TYPE_NAMES = [
-        self::TYPE_UNDEFINED => 'Undefined',
-        self::TYPE_CLASS     => 'Class',
-        self::TYPE_INTERFACE => 'Interface',
-        self::TYPE_TRAIT     => 'Trait'
-    ];
-
-    public function __construct($string, $type) {
-
-        $this->string = (string)$string;
-        $this->ensureType($type);
-    }
-
-    protected function isClass() {
-
-        $autoload = $this->autoload;
-
-        return class_exists($this->string, $autoload);
-    }
-
-    protected function isInterface() {
-
-        $autoload = $this->autoload;
-
-        return interface_exists($this->string, $autoload);
-    }
-
-    protected function isTrait() {
-
-        $autoload = $this->autoload;
-
-        return (bool)trait_exists($this->string, $autoload);
-    }
-
-    /**
-     * @return int on of the TYPE_... constant
-     */
-    protected function getType() {
-
-        if ($this->isClass()) {
-            return self::TYPE_CLASS;
-        }
-
-        if ($this->isInterface()) {
-            return self::TYPE_INTERFACE;
-        }
-
-        if ($this->isTrait()) {
-            return self::TYPE_TRAIT;
-        }
-
-        return self::TYPE_UNDEFINED;
-    }
-
-    protected function ensureType($type) {
-
-        $names = $this->TYPE_NAMES;
-
-        if (!isset($names[$type])) {
-            throw new InvalidTypeException(sprintf("Undefined type %s.", $type));
-        }
-
-        $isType      = $this->getType();
-        $istTypeName = $names[$isType];
-
-        $typeName = $names[$type];
-
-        if ($isType !== $type) {
-            throw new InvalidTypeException(
-                sprintf("%s [%s (%d)] is not a %s (%d).",
-                    $this, $istTypeName, $isType, $typeName, $type)
-            );
-        }
-    }
-
-    public function __toString() {
-
-        return $this->string;
-    }
-}
-
-class TUndefined extends TLanguage
-{
-    public function __construct($string) {
-
-        parent::__construct($string, self::TYPE_UNDEFINED);
-    }
-}
-
-class TClass extends TLanguage
-{
-    public function __construct($string) {
-
-        parent::__construct($string, self::TYPE_CLASS);
-    }
-}
-
-class TInterface extends TLanguage
-{
-    public function __construct($string) {
-
-        parent::__construct($string, self::TYPE_INTERFACE);
-    }
-}
-
-class TTrait extends TLanguage
-{
-    public function __construct($string) {
-
-        parent::__construct($string, self::TYPE_TRAIT);
-    }
-}
-
 class Actor
 {
     /**
-     * @var TClass
+     * @var PhpClassname
      */
     private $class;
 
@@ -196,17 +73,17 @@ class Actor
 
     public function setClass($class) {
 
-        if ($class instanceof TClass) {
+        if ($class instanceof PhpClassname) {
             $this->class = $class;
         } else {
-            $this->class = new TClass($class);
+            $this->class = new PhpClassname($class);
         }
     }
 
     public function castRole($trait, $interface) {
 
-        $traitFQCN     = (new TTrait($trait))->getFullyQualifiedClassName();
-        $interfaceFQCN = (new TInterface($interface))->getFullyQualifiedClassName();
+        $traitFQCN     = (new PhpClassname($trait))->getFullyQualifiedClassName();
+        $interfaceFQCN = (new PhpClassname($interface))->getFullyQualifiedClassName();
         $classFQCN     = $this->class->getFullyQualifiedClassName();
 
         $newClassName = $this->generateActorClassname($classFQCN, $traitFQCN, $interfaceFQCN);
