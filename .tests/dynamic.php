@@ -98,8 +98,6 @@ class Actor
 
         $definition = $this->generateActorClass($actorClassname, $classFQCN, $traitFQCN, $interfaceFQCN);
 
-        echo $definition, "\n";
-
         eval($definition);
 
         return $actorClassname;
@@ -127,7 +125,7 @@ class Actor
         $traitHash     = PhpClassname::hash($traitFQCN);
         $interfaceHash = PhpClassname::hash($interfaceFQCN);
 
-        return sprintf("%s_ACT_%s_ROLE_%s", $classFQCN, $traitHash, $interfaceHash);
+        return sprintf("%s᚜%sᚖ%s᚛", $classFQCN, $traitHash, $interfaceHash);
     }
 }
 
@@ -163,4 +161,10 @@ $sourceActor->transferTo(new \App\Currency(10), $sinkActor);
 $sourceActor2 = make_actor($sourceActor, 'TransferMoneySource', 'MoneySource');
 $sourceActor2->transferTo(new \App\Currency(10), $sinkActor);
 
+echo "After: ", $sourceActor2->getAvailableBalance(), "\n";
+
+$casting = new DCI\Casting();
+$casting->setRoleAndScript('MoneySource', 'TransferMoneySource')->castOf($sourceActor2);
+
+$sourceActor2->transferTo(new \App\Currency(980), $sinkActor);
 echo "After: ", $sourceActor2->getAvailableBalance(), "\n";
