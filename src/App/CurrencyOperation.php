@@ -32,6 +32,9 @@ class CurrencyOperation extends Currency
         return new Currency(substr_replace($sc, '.', -$orig, 0));
     }
 
+    /**
+     * @return number < 0 if A is lower than B; = 0: if A and B are equal; > 0: if A is greater than B
+     */
     public function compare(Currency $a, Currency $b) {
 
         list(, $sa, $sb) = $this->cloneAndPadDecimalAndString($a, $b);
@@ -40,6 +43,7 @@ class CurrencyOperation extends Currency
     }
 
     private function cloneAndPadDecimalAndString(Currency $a, Currency $b) {
+
         $a = clone $a;
         $b = clone $b;
 
@@ -57,6 +61,7 @@ class CurrencyOperation extends Currency
      * @return int
      */
     private function padDecimal(Currency $a, Currency $b) {
+
         $max        = max(array_map('strlen', [$a->decimal, $b->decimal]));
         $max        = max($max, 2);
         $a->decimal = str_pad($a->decimal, $max, '0');

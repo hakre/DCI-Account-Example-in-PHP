@@ -20,27 +20,33 @@ class Currency
     protected $sign, $integer, $decimal;
 
     public function __construct($amount) {
+
         $this->setFromString($amount);
     }
 
     public function isLowerThan(Currency $amount) {
-        return 0 < $this->operation('compare', $amount);
+
+        return $this->operation('compare', $amount) < 0;
     }
 
     public function isNegative() {
+
         return $this->sign === '-';
     }
 
     public function add(Currency $amount) {
+
         $this->operate('add', $amount);
     }
 
     public function sub(Currency $amount) {
+
         $this->operate('sub', $amount);
     }
 
     private function operate($operation, Currency $operand) {
-        $result = $this->operate($operation, $operand);
+
+        $result = $this->operation($operation, $operand);
         $this->setFromString($result);
     }
 
@@ -50,10 +56,12 @@ class Currency
      * @return Currency
      */
     private function operation($operation, Currency $operand) {
+
         return (new CurrencyOperation)->{$operation}($this, $operand);
     }
 
     protected function setFromString($string) {
+
         $r = preg_match('~^(?:([+-])(?: *))?((?:\d+ )*\d+)?(?:\.(\d*))?$~', $string, $matches);
         if (!$r) {
             throw new \InvalidArgumentException(sprintf('Amount invalid format: "%s"', $string));
