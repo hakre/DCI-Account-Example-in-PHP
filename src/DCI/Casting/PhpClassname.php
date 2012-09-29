@@ -62,7 +62,7 @@ class PhpClassname
 
     private function extractNamespace($classname) {
 
-        // TODO: Check for PHP string function: locate last occurrence of a char and return everything before it
+        // TODO: Check for PHP string function: locate last occurrence of a string and return everything before it
         $pos = strrpos($classname, self::SEPARATOR);
 
         if ($pos === false) {
